@@ -1,61 +1,28 @@
-# Asset Pipeline
+# Godot Asset Pipeline
 
-Use this reference for ImageGen, placeholder assets, imported art, UI mockups, icons, textures, and final asset replacement across Godot, Unity, and Unreal.
+Read this reference only when generating, importing, replacing, or binding runtime art.
 
-## Folder Policy
+## Asset record
 
-- `art/concepts/`: concept images and mood references.
-- `art/source/`: editable or source art.
-- `assets/`: portable runtime source assets for Godot or shared asset staging.
-- `Assets/`: Unity runtime assets when working inside a Unity project.
-- `Content/`: Unreal runtime content when working inside an Unreal project.
-- `assets/sprites/`, `assets/textures/`, `assets/ui/`, `assets/vfx/`: recommended Godot/shared subfolders.
-- `audio/sfx/`: sound effects.
-- `audio/music/`: music loops and stingers.
+Before integration, record purpose and gameplay scale, source or generation method, license/attribution, source and runtime paths, relevant import settings, runtime binding, and temporary replacement status.
 
-## Naming
+Create `docs/asset-list.md` only when the project starts real asset production. Do not create it for an empty prototype.
 
-Use stable, descriptive names:
+## Workflow
 
-- `player_idle.png`
-- `enemy_slime_walk.png`
-- `ui_health_icon.png`
-- `vfx_hit_spark.png`
-- `sfx_pickup_coin.wav`
+1. Define the asset's gameplay job and target dimensions before generation or download.
+2. Keep editable source material separate from runtime imports when both exist.
+3. Use project-relative `res://` paths. Never bind scenes to temporary-generation folders or absolute machine paths.
+4. Import in Godot and inspect warnings, dimensions, alpha, filtering, compression, animation frames, and memory impact.
+5. Bind the asset to a real scene/resource and run that scene at gameplay scale.
+6. Capture rendered evidence. File presence and successful import do not prove visual acceptance.
 
-Avoid generated random names in scenes. Rename assets before binding them to resources.
+## Readability and replacement
 
-## ImageGen Workflow
+- Critical actors, hazards, rewards, and interactables need distinct silhouette, value, or motion—not color alone.
+- UI art must be checked at the smallest supported viewport and scale setting.
+- Pixel art should use explicit filtering and integer-scale assumptions where appropriate.
+- Replacing an asset must preserve or deliberately update dependent regions, pivots, collisions, animation names, and material parameters.
+- Do not overwrite existing project art unless the user explicitly requested replacement.
 
-1. Define art direction from `docs/game-brief.md`.
-2. Generate a small style target first: player, enemy, pickup, UI icon.
-3. Save concepts under `art/concepts/`.
-4. Save runtime-ready images under the selected engine's project asset folder.
-5. Import through the selected engine or run an editor import check.
-6. Bind assets to scenes/resources, Unity prefabs/materials, or Unreal assets/materials as appropriate.
-7. Update `docs/asset-list.md` with status and usage.
-
-## Placeholder Policy
-
-Placeholders are acceptable only if they preserve gameplay readability:
-
-- Use distinct shapes and colors for player, enemy, hazard, pickup, exit.
-- Label debug placeholders only when it helps the developer; avoid shipping labels inside the game world.
-- Replace placeholders that affect player understanding before calling a slice polished.
-
-## UI Mockups
-
-For menus and HUD:
-
-- Sketch the hierarchy before generating art.
-- Use icons for repeated resources.
-- Keep button states: default, hover, pressed, disabled.
-- Verify text at 1280x720 and a smaller fallback resolution.
-
-## Import Checks
-
-After adding image assets:
-
-- Run the relevant editor import once when available.
-- Treat engine-generated import metadata as derived artifacts, not source truth.
-- Fix missing resource paths before continuing.
+Use Godot's [stable asset-pipeline documentation](https://docs.godotengine.org/en/stable/tutorials/assets_pipeline/index.html) matching the project version. Treat generated assets like third-party assets: provenance and permission still need to be recorded.

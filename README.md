@@ -1,134 +1,136 @@
-# Game Studio Agent
+# Godot Game Studio Agent
 
-Portable Codex skill for building first-playable games in Godot 4.x, Unity, and Unreal Engine 5.x with a professional studio-style role system.
+An evidence-driven Codex skill for building, debugging, playtesting, polishing, validating, and exporting Godot 4.x games.
 
-This skill helps Codex detect the project engine, route work through directors, department leads, and specialists, create game production docs, manage ImageGen asset workflows, improve game feel, run playtest QA, and prepare engine-specific release checks.
+Version `v0.4.0` replaces the previous multi-engine studio-role simulation with a Godot-only production loop:
 
-## Features
+```text
+check -> hypothesize -> implement -> run -> observe -> decide -> expand -> export
+```
 
-- Godot, Unity, and Unreal project detection.
-- GodotIQ MCP setup for Godot projects.
-- Professional studio role routing: directors, leads, and specialists.
-- First-playable production workflow.
-- Genre templates for common game types.
-- Game brief, development plan, asset list, and polish checklist generation.
-- Game-feel guidance for controls, camera, feedback, UI, audio, and VFX.
-- ImageGen-friendly art and asset pipeline.
-- Engine-specific quality gates and release checks.
-- Portable PowerShell scripts for Windows users.
+## What it does
 
-## Support Matrix
+- Starts a minimal Godot 4.x project without overwriting existing project files.
+- Keeps a compact game brief and evidence-oriented development plan.
+- Connects core-loop, onboarding, level-design, game-feel, performance, audio, and accessibility decisions to observable quality gates.
+- Validates project import, headless runtime, and optional exported-build execution with durable JSON receipts.
+- Configures GodotIQ MCP explicitly and idempotently without creating duplicate TOML tables.
+- Routes save systems, deterministic randomness, economies, multiplayer, telemetry, monetization, and live operations through dedicated risk checks.
 
-| Engine | Detection | Starter docs | Project bootstrap | Editor automation |
-| --- | --- | --- | --- | --- |
-| Godot 4.x | Yes | Yes | Minimal project shell | GodotIQ MCP when configured |
-| Unity | Yes | Yes | Docs and folders only | Use editor/CLI logs when available |
-| Unreal 5.x | Yes | Yes | Docs and folders only | Use commandlets/editor logs when available |
+## Evidence levels
 
-Unity and Unreal support intentionally avoids downloading or creating large editor projects automatically. Create or open those projects with official editor tooling, then use this skill for routing, docs, checks, and implementation guidance.
+| Level | Meaning |
+| --- | --- |
+| L0 `SOURCE_INSPECTED` | Source/configuration inspected; no runtime claim. |
+| L1 `HEADLESS_SMOKE` | Import/parse and headless runtime passed. |
+| L2 `GRAPHICAL_RUNTIME` | Rendered game observed. |
+| L3 `INPUT_REPLAY` | Named inputs produced expected visible state changes. |
+| L4 `EXPORTED_BLACK_BOX` | Exported build launched outside the editor. |
+
+A lower level never implies a higher one. A first-playable claim needs L2 and L3; a release claim needs L4.
 
 ## Install
 
-Clone this repository, then run:
+Clone directly into the Codex skills directory:
 
 ```powershell
-.\scripts\install-skill.ps1 -Force
+git clone https://github.com/logi-cmd/godot-game-studio-agent.git `
+  "$env:USERPROFILE\.codex\skills\godot-game-studio-agent"
 ```
 
-By default, the installer copies the skill to:
+If `CODEX_HOME` points elsewhere, clone into `$env:CODEX_HOME\skills\godot-game-studio-agent` instead. Restart Codex after installing or updating a skill.
 
-- `CODEX_HOME\skills` when `CODEX_HOME` is set.
-- `$HOME\.codex\skills` otherwise.
-
-Restart Codex after installing or updating the skill.
-
-## Detect A Project
+To update an existing Git checkout:
 
 ```powershell
-.\scripts\detect-game-engine.ps1 -ProjectPath "<project-root>"
-.\scripts\check-engine-env.ps1 -ProjectPath "<project-root>"
+git -C "$env:USERPROFILE\.codex\skills\godot-game-studio-agent" pull --ff-only
 ```
 
-Detection markers:
+`v0.4.0` intentionally removes the old engine-selection, role-routing, packaging, and installer commands. Replace an older installation rather than mixing files from both versions.
 
-- Godot: `project.godot`
-- Unity: `Assets/`, `Packages/manifest.json`, `ProjectSettings/ProjectVersion.txt`
-- Unreal: `*.uproject`
-
-## Start A New Game Project
-
-Godot starter:
-
-```powershell
-.\scripts\start-game-project.ps1 -Engine godot -ProjectPath "<project-root>" -ProjectName "My Game" -Genre "2D platformer"
-```
-
-Unity or Unreal starter docs:
-
-```powershell
-.\scripts\start-game-project.ps1 -Engine unity -ProjectPath "<project-root>" -ProjectName "My Game" -Genre "top-down action"
-.\scripts\start-game-project.ps1 -Engine unreal -ProjectPath "<project-root>" -ProjectName "My Game" -Genre "action RPG"
-```
-
-Unity and Unreal flows create production docs and folders but do not download or generate large editor projects automatically.
-
-## Configure GodotIQ MCP
-
-From a Godot project root:
-
-```powershell
-.\scripts\setup-godot-mcp.ps1 -ProjectPath "<project-root>" -InstallGodotIQ -InstallAddon
-```
-
-Restart Codex after changing MCP configuration.
-
-## Use In Codex
-
-Example prompts:
+## Use in Codex
 
 ```text
-Use $godot-game-studio-agent to detect this project's engine and route a first-playable plan through the studio roles.
+Use $godot-game-studio-agent to inspect this Godot project, improve one playable behavior, and verify it at the strongest available evidence level.
 ```
 
-```text
-Use $godot-game-studio-agent to improve this Unity prototype's movement, camera, VFX, audio, UI, and QA loop.
+The skill entrypoint routes only the references needed for the current task.
+
+## Scripts
+
+### Start a minimal project
+
+```powershell
+.\scripts\start-godot-project.ps1 `
+  -ProjectPath "C:\games\my-game" `
+  -ProjectName "My Game" `
+  -Genre "platformer" `
+  -TargetPlatform "desktop" `
+  -Perspective "2D"
 ```
 
-```text
-Use $godot-game-studio-agent to prepare an Unreal release checklist and engine-specific quality gate report.
+The script creates only `project.godot`, a main scene/script, two state documents, and `artifacts/validation/`. Existing project files and documents are preserved.
+
+### Check the environment
+
+```powershell
+.\scripts\check-godot-env.ps1 -ProjectPath "C:\games\my-game"
 ```
 
-## Studio Workflow
+Use `-AsJson` for machine-readable output. GodotIQ is optional for ordinary project work.
 
-The skill routes work through a three-tier studio structure:
+### Configure GodotIQ explicitly
 
-- Directors own scope, creative direction, technical risk, art, audio, QA, and release.
-- Department leads own design, engine workflow, gameplay, UI/UX, levels, technical art, tools, performance, and narrative.
-- Specialists own engine implementation, combat, systems, game feel, camera, VFX, materials, UI implementation, audio, QA, accessibility, export, and documentation.
-
-Use `references/role-routing.md` for task routing and `references/role-quality-gates.md` for done criteria.
-
-## Repository Layout
-
-```text
-SKILL.md
-README.md
-agents/
-  roles/
-references/
-scripts/
+```powershell
+.\scripts\setup-godot-mcp.ps1 `
+  -ProjectPath "C:\games\my-game" `
+  -InstallGodotIQ `
+  -InstallAddon
 ```
+
+This is the only script that edits Codex's global `config.toml`. It validates existing and candidate TOML with Python 3.11+ `tomllib`, preserves unrelated configuration, creates a backup only when the file changes, and refuses to modify invalid TOML.
+
+### Validate a project
+
+```powershell
+.\scripts\validate-godot-project.ps1 -ProjectPath "C:\games\my-game"
+```
+
+To export and launch a Windows build:
+
+```powershell
+.\scripts\validate-godot-project.ps1 `
+  -ProjectPath "C:\games\my-game" `
+  -ExportPreset "Windows Desktop" `
+  -ExportPath "C:\games\my-game\exports\my-game.exe"
+```
+
+Every run writes raw logs and `receipt.json` under a unique `artifacts/validation/<run-id>/` directory. Graphical and input evidence remain `not_run` until actually observed through an editor or automation tool.
 
 ## Requirements
 
 - Codex with local skill support.
-- Godot 4.x for Godot projects.
-- Unity Editor for Unity project checks.
-- Unreal Engine 5.x for Unreal project checks.
-- PowerShell on Windows.
-- `uvx` for GodotIQ MCP setup.
-- Optional: Node.js and Git for fallback tooling.
+- Godot 4.x; release validation used Godot 4.7.
+- PowerShell 7 on Windows.
+- Python 3.11+ and `uvx` only for safe GodotIQ configuration.
+- Matching Godot export templates for L4 export validation.
 
-## Safety
+## Test
 
-The repository is intended to contain only portable skill source files, public documentation, and setup scripts. Do not commit local project files, generated images, credentials, local logs, or machine-specific configuration.
+```powershell
+.\tests\smoke.ps1
+```
+
+The isolated suite covers minimal bootstrap, file preservation, Unicode/special-character paths, Godot 4.x discovery, L1 receipts, MCP TOML replacement and idempotence, invalid-TOML protection, injected parse/resource/main-scene failures, Windows export, and L4 black-box launch.
+
+## Repository layout
+
+```text
+SKILL.md
+agents/openai.yaml
+references/
+scripts/
+tests/smoke.ps1
+```
+
+The runtime skill contains no generated assets, credentials, local Codex configuration, project logs, or release binaries.
